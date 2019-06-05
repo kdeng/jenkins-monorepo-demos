@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>io.osnz.demos</groupId>
+  <artifactId>hello-service</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>hello-service</name>
+  <description>hello-service</description>
+  <url>https://github.com/kdeng/hello-service</url>
+
+  <properties>
+    <main.class>io.osnz.demos.javalin.Application</main.class>
+    <app.properties>/etc/app/app.properties</app.properties>
+    <secret.properties>/etc/app/secret.properties</secret.properties>
+    <app.base.properties>-Ddummy=false</app.base.properties>
+    <jib-maven-plugin.version>1.2.0</jib-maven-plugin.version>
+    <docker.image.from>openjdk:11.0.3-jre-slim-stretch</docker.image.from>
+    <docker.image.to>asbengagement/${project.artifactId}</docker.image.to>
+    <docker.image.to.tag.version>${project.version}</docker.image.to.tag.version>
+    <docker.image.to.tag.dev>dev</docker.image.to.tag.dev>
+    <docker.to.auth.username>changeme</docker.to.auth.username>
+    <docker.to.auth.password>changeme</docker.to.auth.password>
+    <docker.image.port>8080</docker.image.port>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.javalin</groupId>
+      <artifactId>javalin</artifactId>
+      <version>3.0.0.RC3</version>
+    </dependency>
+    <dependency>
+      <groupId>nz.net.osnz.composite</groupId>
+      <artifactId>composite-log4j2</artifactId>
+      <version>[1.1]</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.14</version>
+        <extensions>true</extensions>
+        <configuration>
+          <filtering>false</filtering>
+          <tiles>
+            <tile>io.osnz.tiles:java-tile:[1,2)</tile>
+          </tiles>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.google.cloud.tools</groupId>
+        <artifactId>jib-maven-plugin</artifactId>
+        <version>${jib-maven-plugin.version}</version>
+        <configuration>
+          <from>
+            <image>${docker.image.from}</image>
+          </from>
+          <container>
+            <ports>
+              <port>${docker.image.port}</port>
+            </ports>
+            <useCurrentTimestamp>true</useCurrentTimestamp>
+            <mainClass>${main.class}</mainClass>
+            <jvmFlags>
+              <jvmFlag>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</jvmFlag>
+              <jvmFlag>-Dio.netty.tryReflectionSetAccessible=true</jvmFlag>
+              <jvmFlag>--add-opens=java.base/java.nio=ALL-UNNAMED</jvmFlag>
+            </jvmFlags>
+          </container>
+          <to>
+            <image>${docker.image.to}</image>
+            <tags>
+              <tag>${docker.image.to.tag.version}</tag>
+              <tag>${docker.image.to.tag.dev}</tag>
+            </tags>
+            <auth>
+              <username>${docker.to.auth.username}</username>
+              <password>${docker.to.auth.password}</password>
+            </auth>
+          </to>
+        </configuration>
+        <executions>
+          <execution>
+            <id>build-docker</id>
+            <phase>install</phase>
+            <goals>
+              <goal>dockerBuild</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+</project>
