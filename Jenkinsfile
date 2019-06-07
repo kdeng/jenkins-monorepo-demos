@@ -34,7 +34,10 @@ pipeline {
 
     stage('Build root reactor') {
       when {
-        changeset "**/Jenkinsfile"
+        anyOf {
+          changeset "Jenkinsfile"
+          changeset "README.md"
+        }
       }
       steps {
         echo 'building root reactor'
