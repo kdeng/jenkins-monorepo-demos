@@ -5,9 +5,7 @@ pipeline {
   options {
     timestamps()
   }
-  triggers {
-    bitbucketPush()
-  }
+
   stages {
 
     stage('Checkout') {
@@ -21,7 +19,7 @@ pipeline {
         changeset "hello-ui/**"
       }
       steps {
-        build 'hello-ui'
+        echo 'building hello-ui'
       }
     }
 
@@ -30,7 +28,7 @@ pipeline {
         changeset "hello-service/**"
       }
       steps {
-        build 'hello-service'
+        echo 'building hello-service'
       }
     }
 
