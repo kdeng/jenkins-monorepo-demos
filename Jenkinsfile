@@ -32,5 +32,14 @@ pipeline {
       }
     }
 
+    stage('Build root reactor') {
+      when {
+        changeset "/*"
+      }
+      steps {
+        echo 'building root reactor'
+      }
+    }
+
   }
 }
